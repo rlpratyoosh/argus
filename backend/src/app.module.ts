@@ -12,10 +12,12 @@ import { RolesGuard } from './common/guards/roles.guard';
 import { IncidentModule } from './incident/incident.module';
 import envValidation from './config/env.validation';
 import mailConfig from './config/mail.config';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
     AuthModule,
+    EventsModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
