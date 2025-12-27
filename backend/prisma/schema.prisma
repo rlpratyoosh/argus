@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserType {
+  ADMIN
+  USER
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum BattleStatus {
+  PENDING // Waiting for opponent or start signal
+  ONGOING // Match in progress
+  COMPLETED // Match finished normally
+  ABORTED // Someone disconnected/cancelled
+}
+
+// AUTH & USER MANAGEMENT
+
+model User {
+  id         String   @id @default(cuid())
+  username   String   @unique
+  email      String   @unique
+  password   String
+  isVerified Boolean  @default(false)
+  userType   UserType @default(USER)
+
+  // Auth fields
+  verificationToken String?        @unique
+  hashedOtp         String?
+  otpExpiry         DateTime?
+  otpCreatedAt      DateTime?
+  refreshTokens     RefreshToken[]
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([isVerified, userType])
+}
+
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}

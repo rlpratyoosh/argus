@@ -1,0 +1,20 @@
+{
+  "name": "argus-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "---------------- SETUP ----------------": "",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    
+    "---------------- DEV ----------------": "",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"cyan.bold,magenta.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    
+    "---------------- TOOLS ----------------": "",
+    "sync-types": "cp backend/src/dtos/*.ts frontend/types/ 2>/dev/null || echo 'Make sure directories exist!'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
