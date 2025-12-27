@@ -2,13 +2,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
 import { Request } from 'express';
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { safeUser } from '../auth.service';
 export interface safeUserWOTP extends safeUser {
-  otp?: string
+  otp?: string;
 }
 
 @Injectable()

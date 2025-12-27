@@ -82,7 +82,10 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt-refresh'))
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  async refresh(@Req() req: RequestWRefreshUser, @Res({ passthrough: true }) res: Response) {
+  async refresh(
+    @Req() req: RequestWRefreshUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const userId = req.user.sub;
     const refreshToken = req.user.refreshToken;
     const tokenId = req.user.tokenId;
@@ -129,7 +132,10 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async signOut(@Req() req: ValidatedRequest, @Res({ passthrough: true }) res: Response) {
+  async signOut(
+    @Req() req: ValidatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = req.cookies['refresh-token'];
 
     if (refreshToken) await this.authService.logout(refreshToken);
@@ -159,7 +165,10 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('reverify')
   @HttpCode(HttpStatus.OK)
-  async reverify(@Req() req: RequestWUser, @Res({ passthrough: true }) res: Response) {
+  async reverify(
+    @Req() req: RequestWUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     if (req.user.isVerified)
       throw new BadRequestException('User is already verified!');
 
@@ -180,6 +189,6 @@ export class AuthController {
 
   @Get('me')
   getMe(@Req() req: ValidatedRequest) {
-    return req.user
+    return req.user;
   }
 }

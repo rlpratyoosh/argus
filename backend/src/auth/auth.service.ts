@@ -349,5 +349,4 @@ export class AuthService {
 
     await this.sendMail(message, existingUser.email);
   }
-
 }

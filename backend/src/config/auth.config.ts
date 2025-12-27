@@ -8,7 +8,10 @@ export default registerAs('auth', () => ({
     10,
   ),
   verificationSecret: process.env.VERIFICATION_SECRET || 'verification-secret',
-  verificationExpiresIn: parseInt(process.env.VERIFICATION_EXPIRATION_TIME ?? '900', 10),
+  verificationExpiresIn: parseInt(
+    process.env.VERIFICATION_EXPIRATION_TIME ?? '900',
+    10,
+  ),
   issuer: process.env.JWT_ISSUER || 'http://localhost:8000',
   audience: process.env.JWT_AUDIENCE || 'http://localhost:3000',
 }));

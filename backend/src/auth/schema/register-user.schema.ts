@@ -1,12 +1,12 @@
-import z from 'zod'
+import z from 'zod';
 
 export const RegisterUserSchema = z.object({
-    username: z
+  username: z
     .string()
     .min(4, 'Username should have at least 4 charracters')
     .max(32, "Username shouldn't have more than 32 characters"),
-    email: z.email(),
-    password: z
+  email: z.email(),
+  password: z
     .string()
     .min(6, 'Password must be at least 6 characters long')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -15,4 +15,4 @@ export const RegisterUserSchema = z.object({
       /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
       'Password must contain at least one special character',
     ),
-})
+});
