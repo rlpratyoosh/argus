@@ -308,7 +308,7 @@ export class AuthService {
   }
 
   async sendMail(message: string, email: string) {
-    this.mailService.sendMail({
+    await this.mailService.sendMail({
       from: 'Alofy <noreply@alofy.com>',
       to: email,
       subject: 'Verification',
