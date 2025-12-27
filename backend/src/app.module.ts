@@ -1,4 +1,5 @@
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
@@ -33,6 +34,11 @@ import mailConfig from './config/mail.config';
           },
         },
       }),
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 10,
+      max: 100,
     }),
   ],
   controllers: [AppController],
