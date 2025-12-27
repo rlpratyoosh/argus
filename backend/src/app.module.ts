@@ -30,7 +30,7 @@ import { EventsModule } from './events/events.module';
         transport: {
           host: configService.get('mail.host'),
           port: configService.get('mail.port'),
-          secure: true,
+          secure: false,
           auth: {
             user: configService.get('mail.username'),
             pass: configService.get('mail.password'),
