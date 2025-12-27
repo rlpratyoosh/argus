@@ -10,21 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - argus_postgres_data:/var/lib/postgresql/data
-    networks:
-      - argus_net
     restart: always
-  redis:
-    image: redis:alpine
-    container_name: argus_redis
-    ports:
-      - "6379:6379"
-    networks:
-      - argus_net
-    restart: always
-  
+
 volumes:
   argus_postgres_data:
-
-networks:
-  argus_net:
-    driver: bridge

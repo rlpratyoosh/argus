@@ -8,23 +8,9 @@ datasource db {
 
 enum UserType {
   ADMIN
+  RESPONDER
   USER
 }
-
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
-enum BattleStatus {
-  PENDING // Waiting for opponent or start signal
-  ONGOING // Match in progress
-  COMPLETED // Match finished normally
-  ABORTED // Someone disconnected/cancelled
-}
-
-// AUTH & USER MANAGEMENT
 
 model User {
   id         String   @id @default(cuid())
@@ -33,21 +19,23 @@ model User {
   password   String
   isVerified Boolean  @default(false)
   userType   UserType @default(USER)
+  city       String?
+  state      String?
 
-  // Auth fields
   verificationToken String?        @unique
   hashedOtp         String?
   otpExpiry         DateTime?
   otpCreatedAt      DateTime?
   refreshTokens     RefreshToken[]
 
+  incidentsReported Incident[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([isVerified, userType])
+  @@index([city, state])
 }
-
 
 model RefreshToken {
   id        String   @id @default(cuid())
@@ -56,4 +44,43 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      Status   @default(OPEN)
+  validation  Validation @default(PENDING)
+  severity    Severity @default(LOW)
+  reporterId  String
+  reporter    User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  city        String
+  state       String
+  latitude    Float
+  longitude   Float
+  images      String[]
+  votes       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+enum Validation {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }

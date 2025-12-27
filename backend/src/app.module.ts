@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { IncidentModule } from './incident/incident.module';
 import envValidation from './config/env.validation';
 import mailConfig from './config/mail.config';
 
@@ -37,9 +38,10 @@ import mailConfig from './config/mail.config';
     }),
     CacheModule.register({
       isGlobal: true,
-      ttl: 10,
+      ttl: 30 * 1000,
       max: 100,
     }),
+    IncidentModule,
   ],
   controllers: [AppController],
   providers: [

@@ -53,6 +53,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       username: payload.username,
       email: payload.email,
       userType: payload.userType,
+      city: user.city || undefined,
+      state: user.state || undefined,
     };
   }
 }
@@ -62,4 +64,6 @@ export type validatedUser = {
   username: string;
   email: string;
   userType: string;
+  city?: string;
+  state?: string;
 };
