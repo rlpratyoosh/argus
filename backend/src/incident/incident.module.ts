@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { IncidentService } from './incident.service';
-import { IncidentController } from './incident.controller';
+import { EventsModule } from 'src/events/events.module';
 import { PrismaService } from 'src/prisma.service';
+import { IncidentController } from './incident.controller';
+import { IncidentService } from './incident.service';
 
 @Module({
+  imports: [EventsModule],
   controllers: [IncidentController],
   providers: [IncidentService, PrismaService],
 })

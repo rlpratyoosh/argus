@@ -142,7 +142,7 @@ export class AuthService {
 
     await this.sendMail(message, user.email);
 
-    return { message: 'Registration Successful' };
+    return { message: 'Registration Successful, Check email and verify your account!' };
   }
 
   async refresh(userId: string, refreshToken: string, tokenId: string) {

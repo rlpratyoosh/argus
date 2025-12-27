@@ -9,10 +9,14 @@ import validateOrThrow from 'src/common/helper/zod-validation.helper';
 import createIncidentSchema from './schema/create-incident.schema';
 import type { validatedUser } from 'src/auth/strategies/jwt.strategy';
 import type { Incident } from '@prisma/client';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class IncidentService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   async create(createIncidentDto: CreateIncidentDto, userId: string) {
     const validatedData = validateOrThrow(
@@ -41,6 +45,8 @@ export class IncidentService {
           reporterId: userId,
         },
       });
+
+      await this.eventsGateway.notifyIncidentCreation(city, state);
 
       return incident;
     } catch (error) {

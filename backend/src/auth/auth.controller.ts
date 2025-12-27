@@ -189,6 +189,7 @@ export class AuthController {
 
   @Get('me')
   getMe(@Req() req: ValidatedRequest) {
+    console.log(req.user)
     return req.user;
   }
 }

@@ -10,5 +10,6 @@ import { EventsGateway } from './events.gateway';
     JwtModule.registerAsync(authConfig.asProvider()),
   ],
   providers: [EventsGateway],
+  exports: [EventsGateway],
 })
 export class EventsModule {}
