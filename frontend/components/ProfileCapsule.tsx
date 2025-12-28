@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/libs/axios";
-import { LogOut, Monitor, Shield } from "lucide-react";
+import { Crown, LogOut, Monitor, Shield, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -150,6 +150,45 @@ export default function ProfileCapsule() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Navigation - Role-based */}
+                    {(user.userType === "RESPONDER" || user.userType === "ADMIN") && (
+                        <div className="p-2 border-b border-white/5">
+                            <button
+                                onClick={() => {
+                                    router.push("/respond");
+                                    setIsOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-zinc-300 hover:text-blue-400 hover:bg-blue-500/5 transition-all"
+                            >
+                                <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                    <ShieldCheck className="w-4 h-4 text-blue-400" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium">Responder Dashboard</p>
+                                    <p className="text-[10px] text-zinc-500">Manage incidents in your area</p>
+                                </div>
+                            </button>
+
+                            {user.userType === "ADMIN" && (
+                                <button
+                                    onClick={() => {
+                                        router.push("/admin");
+                                        setIsOpen(false);
+                                    }}
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-zinc-300 hover:text-purple-400 hover:bg-purple-500/5 transition-all"
+                                >
+                                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                                        <Crown className="w-4 h-4 text-purple-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Admin Panel</p>
+                                        <p className="text-[10px] text-zinc-500">Manage users and settings</p>
+                                    </div>
+                                </button>
+                            )}
+                        </div>
+                    )}
 
                     {/* Actions */}
                     <div className="p-2">
