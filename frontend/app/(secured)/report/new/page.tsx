@@ -210,7 +210,7 @@ function FormContent({
                         active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? (
-                        <span className="animate-pulse">Sending Alert...</span>
+                        <span className="animate-pulse px-6 py-2">Sending Alert...</span>
                     ) : (
                         <div className="w-full flex items-center justify-center px-6 py-2 gap-2">
                             <div className="relative flex items-center justify-center w-6 h-6">
