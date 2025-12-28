@@ -49,8 +49,8 @@ api.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // Don't attempt refresh if we're already on the login page
-        if (typeof window !== "undefined" && window.location.pathname === "/login") {
+        // Don't attempt refresh if we're already on the login or register page
+        if (typeof window !== "undefined" && (window.location.pathname === "/login" || window.location.pathname === "/register")) {
             return Promise.reject(error);
         }
 
@@ -74,7 +74,8 @@ api.interceptors.response.use(
         } catch (refreshError) {
             processQueue(refreshError as AxiosError);
 
-            if (typeof window !== "undefined") {
+            // Don't redirect to login if already on auth pages
+            if (typeof window !== "undefined" && window.location.pathname !== "/login" && window.location.pathname !== "/register") {
                 window.location.href = "/login";
             }
 
