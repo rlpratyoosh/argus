@@ -5,8 +5,6 @@ import { useState } from "react";
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassowrd] = useState("");
-    const [otpRequested, setOtpRequested] = useState(false);
-    const [otp, setOTP] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
 
@@ -19,7 +17,6 @@ export default function LoginPage() {
             const response = await api.post("/auth/login", {
                 username,
                 password,
-                otp,
             });
 
             setMessage(response.data.message);
@@ -28,24 +25,24 @@ export default function LoginPage() {
         }
     };
 
-    const requestOTP = async () => {
-        setError("");
-        setOTP("");
+    // const requestOTP = async () => {
+    //     setError("");
+    //     setOTP("");
 
-        try {
-            const response = await api.post("/auth/sendotp", {
-                username,
-                password,
-            });
+    //     try {
+    //         const response = await api.post("/auth/sendotp", {
+    //             username,
+    //             password,
+    //         });
 
-            console.log(response.data);
+    //         console.log(response.data);
 
-            setMessage(response.data.message);
-            setOtpRequested(true);
-        } catch (error: any) {
-            setError(error.response?.data?.message || "An error occurred");
-        }
-    };
+    //         setMessage(response.data.message);
+    //         setOtpRequested(true);
+    //     } catch (error: any) {
+    //         setError(error.response?.data?.message || "An error occurred");
+    //     }
+    // };
 
     return (
         <div className="flex flex-col items-center justify-center min-w-screen min-h-screen">
@@ -69,20 +66,6 @@ export default function LoginPage() {
                     className="border p-2"
                     name="password"
                 />
-                <button type="button" onClick={requestOTP} className="px-1 py-2 text-sm border-2">
-                    Request OTP
-                </button>
-                {otpRequested && (
-                    <input
-                        type="text"
-                        onChange={e => setOTP(e.target.value)}
-                        placeholder="Enter your otp"
-                        value={otp}
-                        className="border p-2"
-                        name="otp"
-                    />
-                )}
-
                 <button type="submit" className="px-1 py-2 text-sm border-2">
                     Login
                 </button>

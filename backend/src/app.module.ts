@@ -1,4 +1,3 @@
-import { MailerModule } from '@nestjs-modules/mailer';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,7 +10,6 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { IncidentModule } from './incident/incident.module';
 import envValidation from './config/env.validation';
-import mailConfig from './config/mail.config';
 import { EventsModule } from './events/events.module';
 
 @Module({
@@ -22,22 +20,21 @@ import { EventsModule } from './events/events.module';
       envFilePath: '.env',
       isGlobal: true,
       validate: envValidation,
-      load: [mailConfig],
     }),
-    MailerModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get('mail.host'),
-          port: configService.get('mail.port'),
-          secure: false,
-          auth: {
-            user: configService.get('mail.username'),
-            pass: configService.get('mail.password'),
-          },
-        },
-      }),
-    }),
+    // MailerModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     transport: {
+    //       host: configService.get('mail.host'),
+    //       port: configService.get('mail.port'),
+    //       secure: false,
+    //       auth: {
+    //         user: configService.get('mail.username'),
+    //         pass: configService.get('mail.password'),
+    //       },
+    //     },
+    //   }),
+    // }),
     CacheModule.register({
       isGlobal: true,
       ttl: 30 * 1000,

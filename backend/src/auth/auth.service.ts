@@ -1,4 +1,3 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   ForbiddenException,
@@ -17,7 +16,6 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { HashingProvider } from './providers/hashing.provider';
 import { RegisterUserSchema } from './schema/register-user.schema';
 import { User } from '.prisma/client';
-import type { safeUserWOTP } from './strategies/local.strategy';
 import {
   PrismaClientInitializationError,
   PrismaClientKnownRequestError,
@@ -46,7 +44,6 @@ export class AuthService {
     @Inject(authConfig.KEY)
     private readonly auth: ConfigType<typeof authConfig>,
     private readonly jwt: JwtService,
-    private readonly mailService: MailerService,
   ) {}
 
   async validateUser(
@@ -71,21 +68,21 @@ export class AuthService {
     return null;
   }
 
-  async login(user: safeUserWOTP) {
-    if (!user.otp || !user.hashedOtp)
-      throw new ForbiddenException('Invalid OTP');
+  async login(user: safeUser) {
+    // if (!user.otp || !user.hashedOtp)
+    //   throw new ForbiddenException('Invalid OTP');
 
-    const isMatch = await this.hashingProvider.compare(
-      user.otp,
-      user.hashedOtp,
-    );
+    // const isMatch = await this.hashingProvider.compare(
+    //   user.otp,
+    //   user.hashedOtp,
+    // );
 
-    if (!isMatch) throw new ForbiddenException('Invalid OTP');
+    // if (!isMatch) throw new ForbiddenException('Invalid OTP');
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { hashedOtp: null, otpExpiry: null, otpCreatedAt: null },
-    });
+    // await this.prisma.user.update({
+    //   where: { id: user.id },
+    //   data: { hashedOtp: null, otpExpiry: null, otpCreatedAt: null },
+    // });
 
     const refreshToken = await this.prisma.refreshToken.create({
       data: {
@@ -131,18 +128,18 @@ export class AuthService {
       throw new InternalServerErrorException('Something went wrong');
     }
 
-    const verificationToken = await this.generateVerificationToken(user);
+    // const verificationToken = await this.generateVerificationToken(user);
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { verificationToken },
-    });
+    // await this.prisma.user.update({
+    //   where: { id: user.id },
+    //   data: { verificationToken },
+    // });
 
-    const message = `Click here to verify: ${this.auth.issuer}/auth/verify/${verificationToken}`;
+    // const message = `Click here to verify: ${this.auth.issuer}/auth/verify/${verificationToken}`;
 
-    await this.sendMail(message, user.email);
+    // await this.sendMail(message, user.email);
 
-    return { message: 'Registration Successful, Check email and verify your account!' };
+    return { message: 'Registration Successful'};
   }
 
   async refresh(userId: string, refreshToken: string, tokenId: string) {
@@ -173,63 +170,63 @@ export class AuthService {
     return tokens;
   }
 
-  async verifyUser(token: string) {
-    let payload: { sub: string };
+  // async verifyUser(token: string) {
+  //   let payload: { sub: string };
 
-    try {
-      payload = await this.jwt.verifyAsync(token, {
-        secret: this.auth.verificationSecret,
-      });
-    } catch (er) {
-      console.log(er);
-      throw new UnauthorizedException('Token is invalid or expired!');
-    }
+  //   try {
+  //     payload = await this.jwt.verifyAsync(token, {
+  //       secret: this.auth.verificationSecret,
+  //     });
+  //   } catch (er) {
+  //     console.log(er);
+  //     throw new UnauthorizedException('Token is invalid or expired!');
+  //   }
 
-    const userId = payload.sub;
+  //   const userId = payload.sub;
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //   });
 
-    if (!user) throw new UnauthorizedException('Invalid token!');
+  //   if (!user) throw new UnauthorizedException('Invalid token!');
 
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { verificationToken: null, isVerified: true },
-    });
+  //   await this.prisma.user.update({
+  //     where: { id: userId },
+  //     data: { verificationToken: null, isVerified: true },
+  //   });
 
-    const refreshToken = await this.prisma.refreshToken.create({
-      data: {
-        userId: user.id,
-        token: randomUUID(),
-      },
-    });
+  //   const refreshToken = await this.prisma.refreshToken.create({
+  //     data: {
+  //       userId: user.id,
+  //       token: randomUUID(),
+  //     },
+  //   });
 
-    const tokens = await this.generateTokens(user, refreshToken.id);
-    const hashedRefreshToken = await this.hashingProvider.hash(
-      tokens.refreshToken,
-    );
+  //   const tokens = await this.generateTokens(user, refreshToken.id);
+  //   const hashedRefreshToken = await this.hashingProvider.hash(
+  //     tokens.refreshToken,
+  //   );
 
-    await this.prisma.refreshToken.update({
-      where: { id: refreshToken.id },
-      data: { token: hashedRefreshToken },
-    });
+  //   await this.prisma.refreshToken.update({
+  //     where: { id: refreshToken.id },
+  //     data: { token: hashedRefreshToken },
+  //   });
 
-    return tokens;
-  }
+  //   return tokens;
+  // }
 
-  async reverify(user: safeUser) {
-    const verificationToken = await this.generateVerificationToken(user);
+  // async reverify(user: safeUser) {
+  //   const verificationToken = await this.generateVerificationToken(user);
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { verificationToken },
-    });
+  //   await this.prisma.user.update({
+  //     where: { id: user.id },
+  //     data: { verificationToken },
+  //   });
 
-    const message = `Click here to verify: ${this.auth.issuer}/auth/verify/${verificationToken}`;
+  //   const message = `Click here to verify: ${this.auth.issuer}/auth/verify/${verificationToken}`;
 
-    await this.sendMail(message, user.email);
-  }
+  //   await this.sendMail(message, user.email);
+  // }
 
   async logout(refreshToken: string) {
     const decodedToken = this.jwt.decode(refreshToken);
@@ -307,46 +304,46 @@ export class AuthService {
     );
   }
 
-  async sendMail(message: string, email: string) {
-    await this.mailService.sendMail({
-      from: 'Alofy <noreply@alofy.com>',
-      to: email,
-      subject: 'Verification',
-      text: message,
-    });
-  }
+  // async sendMail(message: string, email: string) {
+  //   await this.mailService.sendMail({
+  //     from: 'Alofy <noreply@alofy.com>',
+  //     to: email,
+  //     subject: 'Verification',
+  //     text: message,
+  //   });
+  // }
 
-  async sendOtp(user: safeUser) {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { id: user.id },
-    });
+  // async sendOtp(user: safeUser) {
+  //   const existingUser = await this.prisma.user.findUnique({
+  //     where: { id: user.id },
+  //   });
 
-    if (!existingUser) throw new UnauthorizedException('User does not exist');
+  //   if (!existingUser) throw new UnauthorizedException('User does not exist');
 
-    const oneMinuteAgo = new Date(Date.now() - 60 * 1000).getTime();
-    if (existingUser?.otpCreatedAt) {
-      const createdAt = existingUser.otpCreatedAt.getTime();
-      if (createdAt > oneMinuteAgo) {
-        const remainingTime = createdAt - oneMinuteAgo;
-        throw new BadRequestException(
-          `Wait for ${Math.ceil(remainingTime / 1000)}s more before trying again!`,
-        );
-      }
-    }
+  //   const oneMinuteAgo = new Date(Date.now() - 60 * 1000).getTime();
+  //   if (existingUser?.otpCreatedAt) {
+  //     const createdAt = existingUser.otpCreatedAt.getTime();
+  //     if (createdAt > oneMinuteAgo) {
+  //       const remainingTime = createdAt - oneMinuteAgo;
+  //       throw new BadRequestException(
+  //         `Wait for ${Math.ceil(remainingTime / 1000)}s more before trying again!`,
+  //       );
+  //     }
+  //   }
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  //   const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    const hashedOtp = await this.hashingProvider.hash(otp);
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 10000);
-    const now = new Date();
+  //   const hashedOtp = await this.hashingProvider.hash(otp);
+  //   const otpExpiry = new Date(Date.now() + 10 * 60 * 10000);
+  //   const now = new Date();
 
-    await this.prisma.user.update({
-      where: { id: existingUser.id },
-      data: { hashedOtp, otpExpiry, otpCreatedAt: now },
-    });
+  //   await this.prisma.user.update({
+  //     where: { id: existingUser.id },
+  //     data: { hashedOtp, otpExpiry, otpCreatedAt: now },
+  //   });
 
-    const message = `Your OTP is: ${otp}`;
+  //   const message = `Your OTP is: ${otp}`;
 
-    await this.sendMail(message, existingUser.email);
-  }
+  //   await this.sendMail(message, existingUser.email);
+  // }
 }

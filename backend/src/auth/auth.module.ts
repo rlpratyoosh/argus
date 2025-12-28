@@ -1,4 +1,3 @@
-import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -26,7 +25,6 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
   imports: [
     ConfigModule.forFeature(authConfig),
     JwtModule.registerAsync(authConfig.asProvider()),
-    MailerModule,
     PassportModule,
   ],
 })

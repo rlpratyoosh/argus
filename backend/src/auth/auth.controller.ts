@@ -13,14 +13,13 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService, type safeUser } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { SetPublic } from 'src/common/decorators/public.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import type { Response, Request } from 'express';
-import { safeUserWOTP } from './strategies/local.strategy';
 interface RequestWUser extends Request {
-  user: safeUserWOTP;
+  user: safeUser;
 }
 import { validatedUser } from './strategies/jwt.strategy';
 export interface ValidatedRequest extends Request {
@@ -49,12 +48,12 @@ export class AuthController {
     if (!req.user.isVerified)
       throw new ForbiddenException('User is not verified!');
 
-    if (
-      !req.user.otp ||
-      !req.user.otpExpiry ||
-      req.user.otpExpiry.getTime() < Date.now()
-    )
-      throw new ForbiddenException('Invalid or Expired OTP');
+    // if (
+    //   !req.user.otp ||
+    //   !req.user.otpExpiry ||
+    //   req.user.otpExpiry.getTime() < Date.now()
+    // )
+    //   throw new ForbiddenException('Invalid or Expired OTP');
 
     const { accessToken, refreshToken } = await this.authService.login(
       req.user,
@@ -107,28 +106,28 @@ export class AuthController {
     return { message: 'Refresh Rotation Succesfull' };
   }
 
-  @SetPublic()
-  @Get('verify/:token')
-  async verifyUser(
-    @Param('token') token: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const { accessToken, refreshToken } =
-      await this.authService.verifyUser(token);
+  // @SetPublic()
+  // @Get('verify/:token')
+  // async verifyUser(
+  //   @Param('token') token: string,
+  //   @Res({ passthrough: true }) res: Response,
+  // ) {
+  //   const { accessToken, refreshToken } =
+  //     await this.authService.verifyUser(token);
 
-    res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000,
-    });
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+  //   res.cookie('access_token', accessToken, {
+  //     httpOnly: true,
+  //     sameSite: 'lax',
+  //     maxAge: 15 * 60 * 1000,
+  //   });
+  //   res.cookie('refresh_token', refreshToken, {
+  //     httpOnly: true,
+  //     sameSite: 'lax',
+  //     maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   });
 
-    return { message: 'User verified succesfully' };
-  }
+  //   return { message: 'User verified succesfully' };
+  // }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
@@ -161,35 +160,34 @@ export class AuthController {
     return { message: 'Logged Out From All Devices' };
   }
 
-  @SetPublic()
-  @UseGuards(AuthGuard('local'))
-  @Post('reverify')
-  @HttpCode(HttpStatus.OK)
-  async reverify(
-    @Req() req: RequestWUser,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    if (req.user.isVerified)
-      throw new BadRequestException('User is already verified!');
+  // @SetPublic()
+  // @UseGuards(AuthGuard('local'))
+  // @Post('reverify')
+  // @HttpCode(HttpStatus.OK)
+  // async reverify(
+  //   @Req() req: RequestWUser,
+  //   @Res({ passthrough: true }) res: Response,
+  // ) {
+  //   if (req.user.isVerified)
+  //     throw new BadRequestException('User is already verified!');
 
-    await this.authService.reverify(req.user);
+  //   await this.authService.reverify(req.user);
 
-    return { message: 'Email sent successfully' };
-  }
+  //   return { message: 'Email sent successfully' };
+  // }
 
-  @SetPublic()
-  @UseGuards(AuthGuard('local'))
-  @Post('sendotp')
-  @HttpCode(HttpStatus.OK)
-  async sendOtp(@Req() req: RequestWUser) {
-    await this.authService.sendOtp(req.user);
+  // @SetPublic()
+  // @UseGuards(AuthGuard('local'))
+  // @Post('sendotp')
+  // @HttpCode(HttpStatus.OK)
+  // async sendOtp(@Req() req: RequestWUser) {
+  //   await this.authService.sendOtp(req.user);
 
-    return { message: 'OTP successfully sent!' };
-  }
+  //   return { message: 'OTP successfully sent!' };
+  // }
 
   @Get('me')
   getMe(@Req() req: ValidatedRequest) {
-    console.log(req.user)
     return req.user;
   }
 }
