@@ -140,10 +140,10 @@ export default function RespondPage() {
             />
 
             {/* Desktop Sidebar */}
-            <div className="hidden md:flex fixed top-6 left-6 bottom-6 w-[420px] flex-col z-10">
+            <div className="hidden md:flex fixed top-6 left-6 bottom-6 w-105 flex-col z-10">
                 <div className="flex flex-col h-full w-full rounded-3xl bg-zinc-900/60 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden">
                     {/* Header */}
-                    <div className="px-6 py-5 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
+                    <div className="px-6 py-5 border-b border-white/5 bg-linear-to-b from-white/5 to-transparent">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">

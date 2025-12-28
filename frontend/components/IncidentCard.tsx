@@ -158,7 +158,7 @@ export default function IncidentCard({ incident }: IncidentCardProps) {
                         </button>
 
                         <span
-                            className={`text-xs font-bold min-w-[24px] text-center transition-colors ${
+                            className={`text-xs font-bold min-w-6 text-center transition-colors ${
                                 votes > 0 ? "text-green-400" : votes < 0 ? "text-red-400" : "text-zinc-400"
                             }`}
                         >

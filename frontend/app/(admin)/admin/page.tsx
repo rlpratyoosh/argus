@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                                         <tr key={user.id} className="hover:bg-white/5 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                                                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
                                                         {user.username.slice(0, 2).toUpperCase()}
                                                     </div>
                                                     <div>
@@ -408,7 +408,7 @@ export default function AdminDashboard() {
                         <div className="p-6 space-y-5">
                             {/* User Info */}
                             <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/50 border border-white/5">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                                <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
                                     {editingUser.username.slice(0, 2).toUpperCase()}
                                 </div>
                                 <div>

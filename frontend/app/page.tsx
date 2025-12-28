@@ -121,7 +121,7 @@ export default function Home() {
                         </Link>
                         <Link
                             href="/register"
-                            className="px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 whitespace-nowrap"
+                            className="px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 whitespace-nowrap"
                         >
                             Get Started
                         </Link>
@@ -155,11 +155,11 @@ export default function Home() {
 
                     {/* Main headline */}
                     <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
-                        <span className="bg-gradient-to-r from-white via-white to-zinc-400 bg-clip-text text-transparent">
+                        <span className="bg-linear-to-r from-white via-white to-zinc-400 bg-clip-text text-transparent">
                             Incident Response
                         </span>
                         <br />
-                        <span className="bg-gradient-to-r from-cyan-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
+                        <span className="bg-linear-to-r from-cyan-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
                             Reimagined
                         </span>
                     </h1>
@@ -174,7 +174,7 @@ export default function Home() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
                             href="/report"
-                            className="group relative px-8 py-4 text-lg font-bold bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 rounded-2xl transition-all duration-300 shadow-2xl shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-1"
+                            className="group relative px-8 py-4 text-lg font-bold bg-linear-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 rounded-2xl transition-all duration-300 shadow-2xl shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-1"
                         >
                             <span className="flex items-center gap-2">
                                 <AlertTriangle className="w-5 h-5" />
@@ -258,7 +258,7 @@ export default function Home() {
             </section>
 
             {/* How It Works */}
-            <section className="relative py-32 px-6 bg-gradient-to-b from-transparent via-cyan-950/10 to-transparent">
+            <section className="relative py-32 px-6 bg-linear-to-b from-transparent via-cyan-950/10 to-transparent">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <span className="text-cyan-400 font-semibold text-sm tracking-wider uppercase mb-4 block">
@@ -288,7 +288,7 @@ export default function Home() {
                         ].map((item, i) => (
                             <div key={i} className="relative text-center">
                                 {i < 3 && (
-                                    <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-cyan-500/50 to-transparent" />
+                                    <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-linear-to-r from-cyan-500/50 to-transparent" />
                                 )}
                                 <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-zinc-900/60 border border-cyan-500/20 mb-4">
                                     <item.icon className="w-10 h-10 text-cyan-400" />
@@ -331,8 +331,8 @@ export default function Home() {
             {/* CTA Section */}
             <section className="relative py-32 px-6">
                 <div className="max-w-4xl mx-auto">
-                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-red-500/10 border border-white/10 p-12 text-center">
-                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5" />
+                    <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-500/10 via-purple-500/10 to-red-500/10 border border-white/10 p-12 text-center">
+                        <div className="absolute inset-0 bg-linear-to-r from-cyan-500/5 to-purple-500/5" />
                         <GlowingOrbs />
 
                         <div className="relative z-10">
@@ -345,7 +345,7 @@ export default function Home() {
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <Link
                                     href="/register"
-                                    className="px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-2xl transition-all duration-300 shadow-2xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:-translate-y-1"
+                                    className="px-8 py-4 text-lg font-bold bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-2xl transition-all duration-300 shadow-2xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:-translate-y-1"
                                 >
                                     Create Free Account
                                 </Link>

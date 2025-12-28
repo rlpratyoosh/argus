@@ -72,7 +72,7 @@ export default function ProfileCapsule() {
                 }`}
             >
                 {/* Avatar Circle */}
-                <div className="w-10 h-10 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20">
+                <div className="w-10 h-10 md:w-9 md:h-9 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20">
                     {initials}
                 </div>
 
@@ -88,7 +88,7 @@ export default function ProfileCapsule() {
                     {/* User Info */}
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
+                            <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
                                 {initials}
                             </div>
                             <div className="flex-1 min-w-0">

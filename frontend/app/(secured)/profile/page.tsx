@@ -100,7 +100,7 @@ export default function ProfilePage() {
 
     if (authLoading || loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-linear-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
             </div>
         );
@@ -147,7 +147,7 @@ export default function ProfilePage() {
     const downvotedCount = myVotes.filter(v => v.userVote?.downVoted).length;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
+        <div className="min-h-screen bg-linear-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
             {/* Header */}
             <div className="border-b border-white/5 bg-zinc-900/50 backdrop-blur-xl sticky top-0 z-30">
                 <div className="max-w-4xl mx-auto px-4 py-4">
@@ -172,7 +172,7 @@ export default function ProfilePage() {
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
                         {/* Avatar & Basic Info */}
                         <div className="flex items-center gap-4">
-                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
+                            <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
                                 {initials}
                             </div>
                             <div>
