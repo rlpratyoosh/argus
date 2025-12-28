@@ -110,6 +110,7 @@ export class IncidentService {
         ) 
       ) <= ${radiusInKm}
       AND "reporterId" NOT IN (${Prisma.join(shadowBannedIds)})
+      AND "status" NOT IN ('RESOLVED', 'CLOSED')
       ORDER BY distance ASC
     `;
     } else {
@@ -131,6 +132,7 @@ export class IncidentService {
             ))
         ) 
       ) <= ${radiusInKm}
+      AND "status" NOT IN ('RESOLVED', 'CLOSED')
       ORDER BY distance ASC
     `;
     }
