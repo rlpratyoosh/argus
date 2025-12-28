@@ -10,19 +10,15 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super({
       usernameField: 'username',
-      passReqToCallback: true,
     });
   }
 
   async validate(
-    req: Request,
     username: string,
     password: string,
   ): Promise<safeUser> {
     const user = await this.authService.validateUser(username, password);
     if (!user) throw new UnauthorizedException('Invalid Credentials');
-
-    const otp = req.body.otp as string | undefined;
 
     return user;
   }

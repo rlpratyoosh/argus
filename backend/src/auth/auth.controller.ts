@@ -45,8 +45,8 @@ export class AuthController {
   ) {
     if (!req.user) throw new UnauthorizedException('User not found!');
 
-    if (!req.user.isVerified)
-      throw new ForbiddenException('User is not verified!');
+    // if (!req.user.isVerified)
+    //   throw new ForbiddenException('User is not verified!');
 
     // if (
     //   !req.user.otp ||
