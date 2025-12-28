@@ -1,7 +1,7 @@
 "use client";
 
 import type { Incident } from "@/types/incident";
-import { AlertTriangle, ChevronDown, X } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import IncidentCard from "./IncidentCard";
 
@@ -44,34 +44,37 @@ function IncidentCapsule({
     index,
     totalVisible,
     onTap,
-    onSwipeUp,
+    onSwipeLeft,
+    onSwipeRight,
 }: {
     incident: Incident;
     index: number;
     totalVisible: number;
     onTap: () => void;
-    onSwipeUp: () => void;
+    onSwipeLeft: () => void;
+    onSwipeRight: () => void;
 }) {
-    const touchStartY = useRef(0);
+    const touchStartX = useRef(0);
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
 
     const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartY.current = e.touches[0].clientY;
+        touchStartX.current = e.touches[0].clientX;
         setIsDragging(true);
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
         if (!isDragging) return;
-        const diff = e.touches[0].clientY - touchStartY.current;
-        if (diff > 0) {
-            setDragOffset(Math.min(diff, 80));
-        }
+        const diff = e.touches[0].clientX - touchStartX.current;
+        // Limit drag distance
+        setDragOffset(Math.max(-120, Math.min(diff, 120)));
     };
 
     const handleTouchEnd = () => {
-        if (dragOffset > 40) {
-            onSwipeUp();
+        if (dragOffset > 50) {
+            onSwipeRight();
+        } else if (dragOffset < -50) {
+            onSwipeLeft();
         }
         setDragOffset(0);
         setIsDragging(false);
@@ -87,9 +90,9 @@ function IncidentCapsule({
             className="absolute left-1/2 transition-all duration-300 ease-out cursor-pointer"
             style={{
                 zIndex,
-                top: `${translateY + (index === 0 ? dragOffset * 0.5 : 0)}px`,
-                transform: `translateX(-50%) scale(${scale})`,
-                opacity: index === 0 && dragOffset > 20 ? opacity * 0.6 : opacity,
+                top: `${translateY}px`,
+                transform: `translateX(calc(-50% + ${index === 0 ? dragOffset : 0}px)) scale(${scale})`,
+                opacity: index === 0 && Math.abs(dragOffset) > 30 ? opacity * 0.6 : opacity,
             }}
             onTouchStart={index === 0 ? handleTouchStart : undefined}
             onTouchMove={index === 0 ? handleTouchMove : undefined}
@@ -111,10 +114,11 @@ function IncidentCapsule({
 
                 <div className="flex-1 min-w-0 max-w-48">
                     <h4 className="text-xs font-bold text-white truncate">{incident.title}</h4>
-                    <p className="text-[10px] text-zinc-400 truncate">{incident.severity} • Tap to view</p>
+                    <p className="text-[10px] text-zinc-400 truncate">{incident.severity} • Swipe to browse</p>
                 </div>
 
-                <ChevronDown className="w-4 h-4 text-zinc-500 animate-bounce shrink-0" />
+                <ChevronLeft className="w-4 h-4 text-zinc-500 shrink-0" />
+                <ChevronRight className="w-4 h-4 text-zinc-500 shrink-0" />
             </div>
         </div>
     );
@@ -128,12 +132,22 @@ export default function MobileIncidentStack({ incidents }: MobileIncidentStackPr
         setStackOrder(incidents.map((_, i) => i));
     }, [incidents]);
 
-    const rotateStack = useCallback(() => {
+    const rotateStackLeft = useCallback(() => {
         setStackOrder(prev => {
             if (prev.length <= 1) return prev;
             const newOrder = [...prev];
             const first = newOrder.shift();
             if (first !== undefined) newOrder.push(first);
+            return newOrder;
+        });
+    }, []);
+
+    const rotateStackRight = useCallback(() => {
+        setStackOrder(prev => {
+            if (prev.length <= 1) return prev;
+            const newOrder = [...prev];
+            const last = newOrder.pop();
+            if (last !== undefined) newOrder.unshift(last);
             return newOrder;
         });
     }, []);
@@ -164,7 +178,8 @@ export default function MobileIncidentStack({ incidents }: MobileIncidentStackPr
                             index={index}
                             totalVisible={visibleCount}
                             onTap={() => handleTap(incident)}
-                            onSwipeUp={rotateStack}
+                            onSwipeLeft={rotateStackLeft}
+                            onSwipeRight={rotateStackRight}
                         />
                     ))}
                 </div>
