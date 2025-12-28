@@ -79,7 +79,6 @@ export class IncidentService {
 
     type IncidentWithDistance = Incident & { distance: number };
 
-    // First, get shadow-banned user IDs to exclude
     const shadowBannedUsers = await this.prismaService.user.findMany({
       where: { trustScore: { lt: 0 } },
       select: { id: true },
@@ -135,7 +134,6 @@ export class IncidentService {
     `;
     }
 
-    // If user is logged in, fetch their vote status for each incident
     if (userId && nearbyIncidents.length > 0) {
       const incidentIds = nearbyIncidents.map((i) => i.id);
       const userVotes = await this.prismaService.votedIncident.findMany({
@@ -188,7 +186,6 @@ export class IncidentService {
     updateIncidentDto: UpdateIncidentResponderDto,
   ) {
     try {
-      // If validation is being updated, adjust the reporter's trust score
       if (updateIncidentDto.validation) {
         const incident = await this.prismaService.incident.findUnique({
           where: { id },
@@ -198,25 +195,23 @@ export class IncidentService {
         if (incident && incident.validation !== updateIncidentDto.validation) {
           let scoreChange = 0;
 
-          // Only apply score changes when moving from PENDING
           if (incident.validation === 'PENDING') {
             if (updateIncidentDto.validation === 'VALIDATED') {
-              scoreChange = 10; // Reward for valid report
+              scoreChange = 10; 
             } else if (updateIncidentDto.validation === 'REJECTED') {
-              scoreChange = -50; // Penalty for fake/invalid report
+              scoreChange = -50;
             }
           }
-          // Handle changing from VALIDATED to REJECTED or vice versa
           else if (
             incident.validation === 'VALIDATED' &&
             updateIncidentDto.validation === 'REJECTED'
           ) {
-            scoreChange = -60; // Remove the +10 bonus and apply -50 penalty
+            scoreChange = -60; 
           } else if (
             incident.validation === 'REJECTED' &&
             updateIncidentDto.validation === 'VALIDATED'
           ) {
-            scoreChange = 60; // Remove the -50 penalty and apply +10 bonus
+            scoreChange = 60; 
           }
 
           if (scoreChange !== 0) {
