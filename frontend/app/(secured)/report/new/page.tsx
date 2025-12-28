@@ -246,6 +246,11 @@ export default function CreateIncidentForm() {
         longitude: 0,
     });
 
+    // Auto-fetch location on mount
+    useEffect(() => {
+        getLocation();
+    }, [getLocation]);
+
     useEffect(() => {
         if (location.latitude && location.longitude) {
             const newPos = { lat: location.latitude, lng: location.longitude };

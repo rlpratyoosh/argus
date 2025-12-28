@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 type locationType = {
     latitude?: number;
@@ -6,40 +6,49 @@ type locationType = {
     error?: string;
 };
 
-export const useGeolocation = () => {
-    const [location, setLocation] = useState<locationType>({
-        latitude: undefined,
-        longitude: undefined,
-        error: undefined,
-    });
+// Cache location in memory for instant access across components
+let cachedLocation: locationType = {
+    latitude: undefined,
+    longitude: undefined,
+    error: undefined,
+};
 
-    const getLocation = () => {
+export const useGeolocation = () => {
+    const [location, setLocation] = useState<locationType>(cachedLocation);
+
+    const getLocation = useCallback(() => {
         if (!navigator.geolocation) {
-            setLocation({
+            const fallback = {
                 latitude: 22.3,
                 longitude: 73.2065,
                 error: "Geolocation is not supported",
-            });
+            };
+            cachedLocation = fallback;
+            setLocation(fallback);
             return;
         }
 
         navigator.geolocation.getCurrentPosition(
             position => {
-                setLocation({
+                const newLocation = {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     error: undefined,
-                });
+                };
+                cachedLocation = newLocation;
+                setLocation(newLocation);
             },
             error => {
-                setLocation({
+                const fallback = {
                     latitude: 22.3,
                     longitude: 73.2065,
                     error: "Could not get your location, try allowing location access in your browser settings.",
-                });
+                };
+                cachedLocation = fallback;
+                setLocation(fallback);
             }
         );
-    };
+    }, []);
 
     return { location, getLocation };
 };
