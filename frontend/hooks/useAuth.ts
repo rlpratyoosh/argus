@@ -6,7 +6,8 @@ interface User {
     username: string;
     email: string;
     userType: string;
-    city: string;
+    city?: string;
+    state?: string;
 }
 
 interface UseAuthReturn {

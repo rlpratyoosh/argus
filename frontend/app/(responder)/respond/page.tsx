@@ -8,7 +8,8 @@ import api from "@/libs/axios";
 import type { Incident } from "@/types/incident";
 import { Filter, RefreshCw, Shield, XCircle } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
 
 const ResponderMapComponent = dynamic(() => import("@/components/Map/ResponderMapComponent"), {
     ssr: false,
@@ -32,6 +33,7 @@ export default function RespondPage() {
     const [validationFilter, setValidationFilter] = useState<FilterValidation>("ALL");
     const [showFilters, setShowFilters] = useState(false);
     const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
+    const socketRef = useRef<Socket | null>(null);
 
     useEffect(() => {
         getLocation();
@@ -56,6 +58,41 @@ export default function RespondPage() {
             fetchIncidents();
         }
     }, [authLoading, user, fetchIncidents]);
+
+    useEffect(() => {
+        if (!user?.city || !user?.state) return;
+
+        const socket = io(process.env.NEXT_PUBLIC_API_URL || "", {
+            withCredentials: true,
+        });
+
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+            console.log("WebSocket connected");
+        });
+
+        const channel = `${user.city}-${user.state}`;
+        socket.on(channel, (data: { message: string }) => {
+            if (data.message === "new") {
+                console.log("New incident notification received, refetching...");
+                fetchIncidents();
+            }
+        });
+
+        socket.on("disconnect", () => {
+            console.log("WebSocket disconnected");
+        });
+
+        socket.on("connect_error", error => {
+            console.error("WebSocket connection error:", error.message);
+        });
+
+        return () => {
+            socket.disconnect();
+            socketRef.current = null;
+        };
+    }, [user?.city, user?.state, fetchIncidents]);
 
     const handleIncidentUpdate = (updatedIncident: Incident) => {
         setIncidents(prev => prev.map(inc => (inc.id === updatedIncident.id ? updatedIncident : inc)));
@@ -356,8 +393,6 @@ export default function RespondPage() {
                     </div>
                 </div>
             )}
-
-            
         </div>
     );
 }
