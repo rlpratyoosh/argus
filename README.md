@@ -64,7 +64,7 @@
 
 | **Tactical Dashboard** | **Mobile Reporting** |
 |:---:|:---:|
-| <img src="./public/dashboard-preview.png" alt="Dashboard" width="400"/> | <img src="./public/mobile-preview.png" alt="Mobile" width="200"/> |
+| <img src="./frontend/public/dashboard-preview.png" alt="Dashboard" width="400"/> | <img src="./frontend/public/mobile-preview.png" alt="Mobile" width="200"/> |
 | *Real-time incident heatmap* | *Draggable bottom-sheet form* |
 
 ---
