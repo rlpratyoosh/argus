@@ -7,9 +7,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-interface AuthenticatedSocket extends Socket {
-  user?: any;
-}
 
 @WebSocketGateway({
   cors: {
@@ -24,13 +21,13 @@ export class EventsGateway implements OnGatewayDisconnect, OnGatewayConnection {
   private readonly logger = new Logger(EventsGateway.name);
 
 
-  async handleConnection(client: AuthenticatedSocket) {
+  async handleConnection(client: Socket) {
     this.logger.log(
-      `Client Connected: ${client.id} (User: ${client.user.username})`,
+      `Client Connected: ${client.id})`,
     );
   }
 
-  async handleDisconnect(client: AuthenticatedSocket) {
+  async handleDisconnect(client: Socket) {
     this.logger.log(`Client Disconnected: ${client.id}`);
   }
 
