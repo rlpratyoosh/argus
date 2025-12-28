@@ -370,7 +370,7 @@ export default function Home() {
                         <span className="font-bold">ARGUS</span>
                         <span className="text-zinc-500 text-sm">• Real-Time Incident Response Platform</span>
                     </div>
-                    <div className="text-zinc-500 text-sm">Built with 💙 for Hackathon 2025</div>
+                    <div className="text-zinc-500 text-sm">Built with 💙 by team O(n!)</div>
                 </div>
             </footer>
         </div>
