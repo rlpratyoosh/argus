@@ -2,10 +2,10 @@
 
 import { useGeolocation } from "@/hooks/useGeolocation";
 import api from "@/libs/axios";
-import { ArrowLeft, ChevronDown, ChevronUp, MapPin } from "lucide-react";
+import { ArrowLeft, Camera, ChevronDown, ChevronUp, MapPin, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const MapWithNoSSR = dynamic(() => import("@/components/Map/FormMapComponent"), {
     ssr: false,
@@ -16,7 +16,7 @@ interface IncidentFormState {
     title: string;
     description: string;
     severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-    images: File[];
+    images: string[]; // Base64 encoded images
     latitude: number;
     longitude: number;
 }
@@ -51,6 +51,46 @@ function FormContent({
     handleSubmit: () => void;
     isSubmitting: boolean;
 }) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        // Limit to 3 images max
+        const remainingSlots = 3 - formData.images.length;
+        const filesToProcess = Array.from(files).slice(0, remainingSlots);
+
+        filesToProcess.forEach(file => {
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Image size must be less than 5MB");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64 = reader.result as string;
+                setFormData({
+                    ...formData,
+                    images: [...formData.images, base64],
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Reset input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const removeImage = (index: number) => {
+        setFormData({
+            ...formData,
+            images: formData.images.filter((_, i) => i !== index),
+        });
+    };
+
     return (
         <div className="space-y-6">
             <div className="space-y-2">
@@ -96,6 +136,53 @@ function FormContent({
                     placeholder="Describe the situation..."
                     className="w-full bg-zinc-800/50 border border-white/10 rounded-xl p-3 text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-all resize-none"
                 />
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    Photos <span className="text-zinc-600">({formData.images.length}/3)</span>
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                    {/* Image Previews */}
+                    {formData.images.map((img, index) => (
+                        <div
+                            key={index}
+                            className="relative w-20 h-20 rounded-xl overflow-hidden border border-white/10 group"
+                        >
+                            <img src={img} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+                            <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-1 right-1 p-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/80"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </div>
+                    ))}
+
+                    {/* Add Image Button */}
+                    {formData.images.length < 3 && (
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-20 h-20 rounded-xl border-2 border-dashed border-white/10 bg-zinc-800/30 flex flex-col items-center justify-center gap-1 text-zinc-500 hover:border-blue-500/50 hover:text-blue-400 hover:bg-blue-500/5 transition-all"
+                        >
+                            <Camera className="w-5 h-5" />
+                            <span className="text-[9px] font-medium">Add</span>
+                        </button>
+                    )}
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="hidden"
+                    />
+                </div>
+                <p className="text-[10px] text-zinc-600">Upload up to 3 photos (max 5MB each)</p>
             </div>
 
             <div className="flex gap-3 px-6 py-4 bg-black/20 rounded-4xl border border-white/5">
@@ -195,7 +282,7 @@ export default function CreateIncidentForm() {
                 severity: formData.severity,
                 latitude: formData.latitude,
                 longitude: formData.longitude,
-                images: [], // TODO: Implement image upload
+                images: formData.images,
             });
 
             router.push("/report");
