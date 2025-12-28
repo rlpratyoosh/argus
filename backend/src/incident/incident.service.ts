@@ -66,9 +66,7 @@ export class IncidentService {
 
     return await this.prismaService.incident.findMany({
       where: {
-        city: user.city,
         state: user.state,
-        // Filter out incidents from shadow-banned users (trustScore < 0)
         reporter: {
           trustScore: { gte: 0 },
         },
