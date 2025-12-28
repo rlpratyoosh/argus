@@ -222,13 +222,13 @@ export default function Home() {
                         <FeatureCard
                             icon={Zap}
                             title="Real-Time Operations"
-                            description="WebSocket-powered live updates ensure responders receive alerts instantly. No refreshing, no delays—just pure reactive response."
+                            description="WebSocket-powered live updates ensure responders receive alerts instantly. No refreshing, no delays, just pure reactive response."
                             gradient="bg-gradient-to-br from-yellow-500/80 to-orange-600/80"
                         />
                         <FeatureCard
                             icon={Star}
                             title="Trust & Karma System"
-                            description="AI-driven reputation engine automatically filters spam and fake reports. Verified contributors rise, bad actors fade away."
+                            description="Reputation engine filters spam and fake reports. Verified contributors rise, bad actors fade away."
                             gradient="bg-gradient-to-br from-purple-500/80 to-pink-600/80"
                         />
                         <FeatureCard
@@ -244,7 +244,7 @@ export default function Home() {
                         <FeatureCard
                             icon={Eye}
                             title="Visual Evidence System"
-                            description="Instant Base64 image uploads allow responders to verify incidents visually before deployment. See it to believe it."
+                            description="Instant image uploads allow responders to verify incidents visually before deployment. See it to believe it."
                             gradient="bg-gradient-to-br from-green-500/80 to-emerald-600/80"
                         />
                         <FeatureCard
@@ -340,8 +340,7 @@ export default function Home() {
                                 Ready to Transform Emergency Response?
                             </h2>
                             <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
-                                Join the next generation of incident management. Report faster, respond smarter, save
-                                lives.
+                                Report faster, respond smarter, save lives.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <Link
