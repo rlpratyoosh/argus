@@ -108,6 +108,7 @@ export class AuthService {
     const validatedData = validateOrThrow(RegisterUserSchema, registerUserDto);
     const data = {
       ...validatedData,
+      isVerified: true,
       password: await this.hashingProvider.hash(validatedData.password),
     };
 
