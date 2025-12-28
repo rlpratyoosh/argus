@@ -2,6 +2,7 @@
 
 import IncidentCard from "@/components/IncidentCard";
 import ReportMapComponent from "@/components/Map/ReportMapComponent";
+import MobileIncidentStack from "@/components/MobileIncidentStack";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import api from "@/libs/axios";
 import { Incident } from "@/types/incident";
@@ -37,7 +38,6 @@ export default function ReportPage() {
 
     return (
         <div className="w-screen h-screen relative bg-black overflow-hidden">
-            {/* THE MAP LAYER */}
             <ReportMapComponent
                 pos={
                     location.latitude && location.longitude
@@ -48,9 +48,7 @@ export default function ReportPage() {
             />
 
             <div className="hidden md:flex fixed top-6 left-6 bottom-6 w-96 flex-col z-10">
-                {/* Glass Container */}
                 <div className="flex flex-col h-full w-full rounded-3xl bg-zinc-900/60 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden">
-                    {/* Header */}
                     <div className="px-6 py-6 border-b border-white/5 bg-linear-to-b from-white/5 to-transparent">
                         <h2 className="text-2xl font-semibold text-white tracking-tight">Nearby Incidents</h2>
                         <p className="text-xs text-zinc-400 mt-1">
@@ -58,7 +56,6 @@ export default function ReportPage() {
                         </p>
                     </div>
 
-                    {/* Scrollable List */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                         {nearbyIncidents.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-40 text-center opacity-50">
@@ -77,6 +74,8 @@ export default function ReportPage() {
                     </div>
                 </div>
             </div>
+
+            <MobileIncidentStack incidents={nearbyIncidents} />
 
             <button
                 onClick={() => router.push("/report/new")}

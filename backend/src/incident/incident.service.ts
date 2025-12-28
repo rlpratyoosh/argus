@@ -132,6 +132,96 @@ export class IncidentService {
     }
   }
 
+  async upvote(id: string, userId: string) {
+    try {
+      const existingVote = await this.prismaService.votedIncident.findUnique({
+        where: { userId_incidentId: { userId, incidentId: id } },
+      });
+
+      if (existingVote?.upVoted) {
+        await this.prismaService.votedIncident.delete({
+          where: { userId_incidentId: { userId, incidentId: id } },
+        });
+        await this.prismaService.incident.update({
+          where: { id },
+          data: { votes: { decrement: 1 } },
+        });
+        return { message: 'Upvote removed', upVoted: false, downVoted: false };
+      }
+
+      let voteChange = 1;
+      if (existingVote?.downVoted) {
+        voteChange = 2;
+      }
+
+      await this.prismaService.votedIncident.upsert({
+        where: { userId_incidentId: { userId, incidentId: id } },
+        create: { userId, incidentId: id, upVoted: true, downVoted: false },
+        update: { upVoted: true, downVoted: false },
+      });
+
+      await this.prismaService.incident.update({
+        where: { id },
+        data: { votes: { increment: voteChange } },
+      });
+
+      return {
+        message: 'Upvoted successfully',
+        upVoted: true,
+        downVoted: false,
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to upvote incident');
+    }
+  }
+
+  async downvote(id: string, userId: string) {
+    try {
+      const existingVote = await this.prismaService.votedIncident.findUnique({
+        where: { userId_incidentId: { userId, incidentId: id } },
+      });
+
+      if (existingVote?.downVoted) {
+        await this.prismaService.votedIncident.delete({
+          where: { userId_incidentId: { userId, incidentId: id } },
+        });
+        await this.prismaService.incident.update({
+          where: { id },
+          data: { votes: { increment: 1 } },
+        });
+        return {
+          message: 'Downvote removed',
+          upVoted: false,
+          downVoted: false,
+        };
+      }
+
+      let voteChange = 1;
+      if (existingVote?.upVoted) {
+        voteChange = 2;
+      }
+
+      await this.prismaService.votedIncident.upsert({
+        where: { userId_incidentId: { userId, incidentId: id } },
+        create: { userId, incidentId: id, upVoted: false, downVoted: true },
+        update: { upVoted: false, downVoted: true },
+      });
+
+      await this.prismaService.incident.update({
+        where: { id },
+        data: { votes: { decrement: voteChange } },
+      });
+
+      return {
+        message: 'Downvoted successfully',
+        upVoted: false,
+        downVoted: true,
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to downvote incident');
+    }
+  }
+
   async remove(id: string) {
     try {
       await this.prismaService.incident.delete({

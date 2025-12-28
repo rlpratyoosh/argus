@@ -62,6 +62,16 @@ export class IncidentController {
     return this.incidentService.update(id, updateIncidentDto);
   }
 
+  @Patch('upvote/:id')
+  upvote(@Param('id') id: string, @Req() req: ValidatedRequest) {
+    return this.incidentService.upvote(id, req.user.userId);
+  }
+
+  @Patch('downvote/:id')
+  downvote(@Param('id') id: string, @Req() req: ValidatedRequest) {
+    return this.incidentService.downvote(id, req.user.userId);
+  }
+
   @Patch('responder/:id')
   @AllowedRole('RESPONDER')
   updateByResponder(

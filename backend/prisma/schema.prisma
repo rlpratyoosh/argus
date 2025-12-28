@@ -27,7 +27,7 @@ model User {
   otpExpiry         DateTime?
   otpCreatedAt      DateTime?
   refreshTokens     RefreshToken[]
-
+  votedIncidents    VotedIncident[]
   incidentsReported Incident[]
 
   createdAt DateTime @default(now())
@@ -46,6 +46,20 @@ model RefreshToken {
   updatedAt DateTime @default(now()) @updatedAt
 }
 
+model VotedIncident {
+  id         String   @id @default(cuid())
+  userId     String
+  incidentId String
+  upVoted     Boolean @default(false)
+  downVoted   Boolean @default(false)
+  createdAt  DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incident  Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, incidentId])
+}
+
 model Incident {
   id          String   @id @default(cuid())
   title       String
@@ -55,6 +69,7 @@ model Incident {
   severity    Severity @default(LOW)
   reporterId  String
   reporter    User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  votedBy     VotedIncident[]
   city        String
   state       String
   latitude    Float

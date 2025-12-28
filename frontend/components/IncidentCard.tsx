@@ -1,6 +1,78 @@
+import api from "@/libs/axios";
 import type { Incident } from "@/types/incident";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useState } from "react";
 
-export default function IncidentCard({ incident }: { incident: Incident }) {
+interface VoteResponse {
+    message: string;
+    upVoted: boolean;
+    downVoted: boolean;
+}
+
+interface IncidentCardProps {
+    incident: Incident;
+    initialUpVoted?: boolean;
+    initialDownVoted?: boolean;
+}
+
+export default function IncidentCard({
+    incident,
+    initialUpVoted = false,
+    initialDownVoted = false,
+}: IncidentCardProps) {
+    const [votes, setVotes] = useState(incident.votes);
+    const [isVoting, setIsVoting] = useState(false);
+    const [upVoted, setUpVoted] = useState(initialUpVoted);
+    const [downVoted, setDownVoted] = useState(initialDownVoted);
+
+    const handleUpvote = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isVoting) return;
+
+        setIsVoting(true);
+        try {
+            const res = await api.patch<VoteResponse>(`/incident/upvote/${incident.id}`);
+            setUpVoted(res.data.upVoted);
+            setDownVoted(res.data.downVoted);
+
+            if (upVoted) {
+                setVotes(prev => prev - 1);
+            } else if (downVoted) {
+                setVotes(prev => prev + 2);
+            } else {
+                setVotes(prev => prev + 1);
+            }
+        } catch (err) {
+            console.error("Failed to upvote", err);
+        } finally {
+            setIsVoting(false);
+        }
+    };
+
+    const handleDownvote = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isVoting) return;
+
+        setIsVoting(true);
+        try {
+            const res = await api.patch<VoteResponse>(`/incident/downvote/${incident.id}`);
+            setUpVoted(res.data.upVoted);
+            setDownVoted(res.data.downVoted);
+
+            if (downVoted) {
+                setVotes(prev => prev + 1);
+            } else if (upVoted) {
+                setVotes(prev => prev - 2);
+            } else {
+                setVotes(prev => prev - 1);
+            }
+        } catch (err) {
+            console.error("Failed to downvote", err);
+        } finally {
+            setIsVoting(false);
+        }
+    };
+
     const getSeverityStyle = (level: string) => {
         switch (level) {
             case "CRITICAL":
@@ -43,10 +115,10 @@ export default function IncidentCard({ incident }: { incident: Incident }) {
                 )}
 
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                    <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white bg-white/10 backdrop-blur-md rounded border border-white/10">
-                        {incident.status}
-                    </span>
-                </div>
+                <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white bg-white/10 backdrop-blur-md rounded border border-white/10">
+                    {incident.status}
+                </span>
+            </div>
 
             <div className="flex flex-col flex-1 min-w-0 py-0.5 justify-between">
                 <div className="space-y-1">
@@ -71,6 +143,51 @@ export default function IncidentCard({ incident }: { incident: Incident }) {
                     <span className="text-[10px] font-mono text-zinc-600">
                         {incident.latitude.toFixed(4)}, {incident.longitude.toFixed(4)}
                     </span>
+
+                    {/* Vote Controls */}
+                    <div className="flex items-center gap-1.5">
+                        <button
+                            onClick={handleUpvote}
+                            disabled={isVoting}
+                            className={`group/btn p-1.5 rounded-lg border active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                                upVoted
+                                    ? "bg-green-500/20 border-green-500/30"
+                                    : "bg-zinc-800/50 border-white/5 hover:bg-green-500/10 hover:border-green-500/20"
+                            }`}
+                            title="Upvote"
+                        >
+                            <ThumbsUp
+                                className={`w-3.5 h-3.5 transition-colors ${
+                                    upVoted ? "text-green-400" : "text-zinc-500 group-hover/btn:text-green-400"
+                                }`}
+                            />
+                        </button>
+
+                        <span
+                            className={`text-xs font-bold min-w-[24px] text-center transition-colors ${
+                                votes > 0 ? "text-green-400" : votes < 0 ? "text-red-400" : "text-zinc-400"
+                            }`}
+                        >
+                            {votes}
+                        </span>
+
+                        <button
+                            onClick={handleDownvote}
+                            disabled={isVoting}
+                            className={`group/btn p-1.5 rounded-lg border active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                                downVoted
+                                    ? "bg-red-500/20 border-red-500/30"
+                                    : "bg-zinc-800/50 border-white/5 hover:bg-red-500/10 hover:border-red-500/20"
+                            }`}
+                            title="Downvote"
+                        >
+                            <ThumbsDown
+                                className={`w-3.5 h-3.5 transition-colors ${
+                                    downVoted ? "text-red-400" : "text-zinc-500 group-hover/btn:text-red-400"
+                                }`}
+                            />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
