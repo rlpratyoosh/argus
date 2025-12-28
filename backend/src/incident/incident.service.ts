@@ -72,7 +72,7 @@ export class IncidentService {
     });
   }
 
-  async findNearby(latitude: number, longitude: number) {
+  async findNearby(latitude: number, longitude: number, userId?: string) {
     const radiusInKm = 2;
 
     type IncidentWithDistance = Incident & { distance: number };
@@ -98,7 +98,36 @@ export class IncidentService {
     ORDER BY distance ASC
   `;
 
-    return nearbyIncidents;
+    // If user is logged in, fetch their vote status for each incident
+    if (userId && nearbyIncidents.length > 0) {
+      const incidentIds = nearbyIncidents.map((i) => i.id);
+      const userVotes = await this.prismaService.votedIncident.findMany({
+        where: {
+          userId,
+          incidentId: { in: incidentIds },
+        },
+      });
+
+      const voteMap = new Map(
+        userVotes.map((v) => [
+          v.incidentId,
+          { upVoted: v.upVoted, downVoted: v.downVoted },
+        ]),
+      );
+
+      return nearbyIncidents.map((incident) => ({
+        ...incident,
+        userVote: voteMap.get(incident.id) || {
+          upVoted: false,
+          downVoted: false,
+        },
+      }));
+    }
+
+    return nearbyIncidents.map((incident) => ({
+      ...incident,
+      userVote: { upVoted: false, downVoted: false },
+    }));
   }
 
   // findOne(id: string) {

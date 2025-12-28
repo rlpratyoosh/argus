@@ -11,19 +11,13 @@ interface VoteResponse {
 
 interface IncidentCardProps {
     incident: Incident;
-    initialUpVoted?: boolean;
-    initialDownVoted?: boolean;
 }
 
-export default function IncidentCard({
-    incident,
-    initialUpVoted = false,
-    initialDownVoted = false,
-}: IncidentCardProps) {
+export default function IncidentCard({ incident }: IncidentCardProps) {
     const [votes, setVotes] = useState(incident.votes);
     const [isVoting, setIsVoting] = useState(false);
-    const [upVoted, setUpVoted] = useState(initialUpVoted);
-    const [downVoted, setDownVoted] = useState(initialDownVoted);
+    const [upVoted, setUpVoted] = useState(incident.userVote?.upVoted ?? false);
+    const [downVoted, setDownVoted] = useState(incident.userVote?.downVoted ?? false);
 
     const handleUpvote = async (e: React.MouseEvent) => {
         e.stopPropagation();

@@ -1,15 +1,15 @@
-import AuthGuard from "@/components/AuthGuard";
 import ProfileCapsule from "@/components/ProfileCapsule";
+import ResponderGuard from "@/components/ResponderGuard";
 
-export default function SecuredLayout({
+export default function ResponderLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <AuthGuard>
+        <ResponderGuard>
             <ProfileCapsule />
             {children}
-        </AuthGuard>
+        </ResponderGuard>
     );
 }

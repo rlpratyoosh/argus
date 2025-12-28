@@ -1,12 +1,13 @@
 "use client";
 
 import type { Incident } from "@/types/incident";
-import { AlertTriangle, ChevronDown, X } from "lucide-react";
+import { AlertTriangle, CheckCircle, ChevronUp, Clock, Shield, X, XCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import IncidentCard from "./IncidentCard";
+import ResponderIncidentCard from "./ResponderIncidentCard";
 
-interface MobileIncidentStackProps {
+interface MobileResponderStackProps {
     incidents: Incident[];
+    onIncidentUpdate?: (updatedIncident: Incident) => void;
 }
 
 function getSeverityColor(level: string) {
@@ -21,6 +22,36 @@ function getSeverityColor(level: string) {
             return "bg-green-500/20 border-green-500/40 text-green-400";
         default:
             return "bg-zinc-700/30 border-zinc-600/30 text-zinc-400";
+    }
+}
+
+function getStatusColor(status: string) {
+    switch (status) {
+        case "OPEN":
+            return "text-blue-400";
+        case "IN_PROGRESS":
+            return "text-yellow-400";
+        case "RESOLVED":
+            return "text-green-400";
+        case "CLOSED":
+            return "text-zinc-400";
+        default:
+            return "text-zinc-400";
+    }
+}
+
+function getStatusIcon(status: string) {
+    switch (status) {
+        case "OPEN":
+            return <AlertTriangle className="w-3 h-3" />;
+        case "IN_PROGRESS":
+            return <Clock className="w-3 h-3" />;
+        case "RESOLVED":
+            return <CheckCircle className="w-3 h-3" />;
+        case "CLOSED":
+            return <XCircle className="w-3 h-3" />;
+        default:
+            return null;
     }
 }
 
@@ -106,21 +137,24 @@ function IncidentCapsule({
                         incident.severity
                     )}`}
                 >
-                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <Shield className="w-3.5 h-3.5" />
                 </div>
 
                 <div className="flex-1 min-w-0 max-w-48">
                     <h4 className="text-xs font-bold text-white truncate">{incident.title}</h4>
-                    <p className="text-[10px] text-zinc-400 truncate">{incident.severity} • Tap to view</p>
+                    <p className="text-[10px] text-zinc-400 truncate flex items-center gap-1">
+                        <span className={getStatusColor(incident.status)}>{getStatusIcon(incident.status)}</span>
+                        {incident.status.replace("_", " ")} • Tap to manage
+                    </p>
                 </div>
 
-                <ChevronDown className="w-4 h-4 text-zinc-500 animate-bounce shrink-0" />
+                <ChevronUp className="w-4 h-4 text-zinc-500 animate-bounce shrink-0" />
             </div>
         </div>
     );
 }
 
-export default function MobileIncidentStack({ incidents }: MobileIncidentStackProps) {
+export default function MobileResponderStack({ incidents, onIncidentUpdate }: MobileResponderStackProps) {
     const [stackOrder, setStackOrder] = useState<number[]>([]);
     const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
 
@@ -145,6 +179,14 @@ export default function MobileIncidentStack({ incidents }: MobileIncidentStackPr
     const closeModal = useCallback(() => {
         setSelectedIncident(null);
     }, []);
+
+    const handleUpdate = useCallback(
+        (updatedIncident: Incident) => {
+            setSelectedIncident(updatedIncident);
+            onIncidentUpdate?.(updatedIncident);
+        },
+        [onIncidentUpdate]
+    );
 
     if (incidents.length === 0 || stackOrder.length === 0) return null;
 
@@ -175,7 +217,7 @@ export default function MobileIncidentStack({ incidents }: MobileIncidentStackPr
                             <div
                                 key={i}
                                 className={`h-1 rounded-full transition-all duration-300 ${
-                                    stackOrder[0] === i ? "bg-white w-4" : "bg-zinc-600 w-1"
+                                    stackOrder[0] === i ? "bg-blue-400 w-4" : "bg-zinc-600 w-1"
                                 }`}
                             />
                         ))}
@@ -199,7 +241,7 @@ export default function MobileIncidentStack({ incidents }: MobileIncidentStackPr
                             <X className="w-5 h-5" />
                         </button>
 
-                        <IncidentCard incident={selectedIncident} />
+                        <ResponderIncidentCard incident={selectedIncident} onUpdate={handleUpdate} />
                     </div>
                 </div>
             )}

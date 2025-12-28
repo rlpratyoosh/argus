@@ -42,10 +42,12 @@ export class IncidentController {
   findNearby(
     @Query('latitude') latitude: string,
     @Query('longitude') longitude: string,
+    @Req() req: ValidatedRequest,
   ) {
     return this.incidentService.findNearby(
       parseFloat(latitude),
       parseFloat(longitude),
+      req.user?.userId,
     );
   }
 

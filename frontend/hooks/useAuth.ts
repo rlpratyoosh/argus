@@ -2,10 +2,11 @@ import api from "@/libs/axios";
 import { useEffect, useState } from "react";
 
 interface User {
-    id: string;
+    userId: string;
+    username: string;
     email: string;
-    name: string;
-    role: string;
+    userType: string;
+    city: string;
 }
 
 interface UseAuthReturn {
