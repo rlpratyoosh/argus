@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import type { Incident } from '@prisma/client';
+import { Prisma, type Incident } from '@prisma/client';
 import type { validatedUser } from 'src/auth/strategies/jwt.strategy';
 import validateOrThrow from 'src/common/helper/zod-validation.helper';
 import { EventsGateway } from 'src/events/events.gateway';
@@ -68,6 +68,10 @@ export class IncidentService {
       where: {
         city: user.city,
         state: user.state,
+        // Filter out incidents from shadow-banned users (trustScore < 0)
+        reporter: {
+          trustScore: { gte: 0 },
+        },
       },
     });
   }
@@ -77,26 +81,59 @@ export class IncidentService {
 
     type IncidentWithDistance = Incident & { distance: number };
 
-    const nearbyIncidents = await this.prismaService.$queryRaw<
-      IncidentWithDistance[]
-    >`
-    SELECT 
-      *, 
-      ( 6371 * acos( 
-          LEAST(1.0, GREATEST(-1.0, 
-            cos( radians(${latitude}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${longitude}) ) + sin( radians(${latitude}) ) * sin( radians( latitude ) ) 
-          ))
-      ) ) AS distance 
-    FROM "Incident" 
-    WHERE ( 
-      6371 * acos( 
-          LEAST(1.0, GREATEST(-1.0, 
-            cos( radians(${latitude}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${longitude}) ) + sin( radians(${latitude}) ) * sin( radians( latitude ) ) 
-          ))
-      ) 
-    ) <= ${radiusInKm}
-    ORDER BY distance ASC
-  `;
+    // First, get shadow-banned user IDs to exclude
+    const shadowBannedUsers = await this.prismaService.user.findMany({
+      where: { trustScore: { lt: 0 } },
+      select: { id: true },
+    });
+    const shadowBannedIds = shadowBannedUsers.map((u) => u.id);
+
+    let nearbyIncidents: IncidentWithDistance[];
+
+    if (shadowBannedIds.length > 0) {
+      nearbyIncidents = await this.prismaService.$queryRaw<
+        IncidentWithDistance[]
+      >`
+      SELECT 
+        *, 
+        ( 6371 * acos( 
+            LEAST(1.0, GREATEST(-1.0, 
+              cos( radians(${latitude}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${longitude}) ) + sin( radians(${latitude}) ) * sin( radians( latitude ) ) 
+            ))
+        ) ) AS distance 
+      FROM "Incident" 
+      WHERE ( 
+        6371 * acos( 
+            LEAST(1.0, GREATEST(-1.0, 
+              cos( radians(${latitude}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${longitude}) ) + sin( radians(${latitude}) ) * sin( radians( latitude ) ) 
+            ))
+        ) 
+      ) <= ${radiusInKm}
+      AND "reporterId" NOT IN (${Prisma.join(shadowBannedIds)})
+      ORDER BY distance ASC
+    `;
+    } else {
+      nearbyIncidents = await this.prismaService.$queryRaw<
+        IncidentWithDistance[]
+      >`
+      SELECT 
+        *, 
+        ( 6371 * acos( 
+            LEAST(1.0, GREATEST(-1.0, 
+              cos( radians(${latitude}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${longitude}) ) + sin( radians(${latitude}) ) * sin( radians( latitude ) ) 
+            ))
+        ) ) AS distance 
+      FROM "Incident" 
+      WHERE ( 
+        6371 * acos( 
+            LEAST(1.0, GREATEST(-1.0, 
+              cos( radians(${latitude}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${longitude}) ) + sin( radians(${latitude}) ) * sin( radians( latitude ) ) 
+            ))
+        ) 
+      ) <= ${radiusInKm}
+      ORDER BY distance ASC
+    `;
+    }
 
     // If user is logged in, fetch their vote status for each incident
     if (userId && nearbyIncidents.length > 0) {
@@ -151,6 +188,46 @@ export class IncidentService {
     updateIncidentDto: UpdateIncidentResponderDto,
   ) {
     try {
+      // If validation is being updated, adjust the reporter's trust score
+      if (updateIncidentDto.validation) {
+        const incident = await this.prismaService.incident.findUnique({
+          where: { id },
+          select: { reporterId: true, validation: true },
+        });
+
+        if (incident && incident.validation !== updateIncidentDto.validation) {
+          let scoreChange = 0;
+
+          // Only apply score changes when moving from PENDING
+          if (incident.validation === 'PENDING') {
+            if (updateIncidentDto.validation === 'VALIDATED') {
+              scoreChange = 10; // Reward for valid report
+            } else if (updateIncidentDto.validation === 'REJECTED') {
+              scoreChange = -50; // Penalty for fake/invalid report
+            }
+          }
+          // Handle changing from VALIDATED to REJECTED or vice versa
+          else if (
+            incident.validation === 'VALIDATED' &&
+            updateIncidentDto.validation === 'REJECTED'
+          ) {
+            scoreChange = -60; // Remove the +10 bonus and apply -50 penalty
+          } else if (
+            incident.validation === 'REJECTED' &&
+            updateIncidentDto.validation === 'VALIDATED'
+          ) {
+            scoreChange = 60; // Remove the -50 penalty and apply +10 bonus
+          }
+
+          if (scoreChange !== 0) {
+            await this.prismaService.user.update({
+              where: { id: incident.reporterId },
+              data: { trustScore: { increment: scoreChange } },
+            });
+          }
+        }
+      }
+
       await this.prismaService.incident.update({
         where: { id },
         data: { ...updateIncidentDto },

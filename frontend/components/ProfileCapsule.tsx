@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/libs/axios";
-import { LogOut, Monitor } from "lucide-react";
+import { LogOut, Monitor, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -94,9 +94,59 @@ export default function ProfileCapsule() {
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-white truncate">{user.username}</p>
                                 <p className="text-xs text-zinc-400 truncate">{user.email}</p>
-                                <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                                    {user.userType}
-                                </span>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                        {user.userType}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Trust Score */}
+                    <div className="px-4 py-3 border-b border-white/5">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                        user.trustScore >= 100
+                                            ? "bg-green-500/10 border border-green-500/20"
+                                            : user.trustScore >= 50
+                                            ? "bg-yellow-500/10 border border-yellow-500/20"
+                                            : user.trustScore >= 0
+                                            ? "bg-orange-500/10 border border-orange-500/20"
+                                            : "bg-red-500/10 border border-red-500/20"
+                                    }`}
+                                >
+                                    <Shield
+                                        className={`w-4 h-4 ${
+                                            user.trustScore >= 100
+                                                ? "text-green-400"
+                                                : user.trustScore >= 50
+                                                ? "text-yellow-400"
+                                                : user.trustScore >= 0
+                                                ? "text-orange-400"
+                                                : "text-red-400"
+                                        }`}
+                                    />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-medium text-zinc-300">Trust Score</p>
+                                    <p className="text-[10px] text-zinc-500">Based on report accuracy</p>
+                                </div>
+                            </div>
+                            <div
+                                className={`text-lg font-bold ${
+                                    user.trustScore >= 100
+                                        ? "text-green-400"
+                                        : user.trustScore >= 50
+                                        ? "text-yellow-400"
+                                        : user.trustScore >= 0
+                                        ? "text-orange-400"
+                                        : "text-red-400"
+                                }`}
+                            >
+                                {user.trustScore}
                             </div>
                         </div>
                     </div>

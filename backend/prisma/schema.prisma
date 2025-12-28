@@ -22,13 +22,15 @@ model User {
   city       String?
   state      String?
 
-  verificationToken String?        @unique
+  verificationToken String?         @unique
   hashedOtp         String?
   otpExpiry         DateTime?
   otpCreatedAt      DateTime?
   refreshTokens     RefreshToken[]
   votedIncidents    VotedIncident[]
   incidentsReported Incident[]
+
+  trustScore Int @default(100)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -50,34 +52,34 @@ model VotedIncident {
   id         String   @id @default(cuid())
   userId     String
   incidentId String
-  upVoted     Boolean @default(false)
-  downVoted   Boolean @default(false)
+  upVoted    Boolean  @default(false)
+  downVoted  Boolean  @default(false)
   createdAt  DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  incident  Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, incidentId])
 }
 
 model Incident {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   title       String
   description String
-  status      Status   @default(OPEN)
-  validation  Validation @default(PENDING)
-  severity    Severity @default(LOW)
+  status      Status          @default(OPEN)
+  validation  Validation      @default(PENDING)
+  severity    Severity        @default(LOW)
   reporterId  String
-  reporter    User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reporter    User            @relation(fields: [reporterId], references: [id], onDelete: Cascade)
   votedBy     VotedIncident[]
   city        String
   state       String
   latitude    Float
   longitude   Float
   images      String[]
-  votes       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  votes       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now()) @updatedAt
 }
 
 enum Validation {

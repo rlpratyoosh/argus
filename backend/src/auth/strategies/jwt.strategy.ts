@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
@@ -55,6 +50,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       userType: payload.userType,
       city: user.city || undefined,
       state: user.state || undefined,
+      trustScore: user.trustScore,
     };
   }
 }
@@ -66,4 +62,5 @@ export type validatedUser = {
   userType: string;
   city?: string;
   state?: string;
+  trustScore: number;
 };

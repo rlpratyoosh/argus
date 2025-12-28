@@ -8,6 +8,7 @@ interface User {
     userType: string;
     city?: string;
     state?: string;
+    trustScore: number;
 }
 
 interface UseAuthReturn {
