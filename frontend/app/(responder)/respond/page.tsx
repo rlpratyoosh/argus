@@ -293,7 +293,11 @@ export default function RespondPage() {
                                     }`}
                                     onClick={() => setSelectedIncident(incident)}
                                 >
-                                    <ResponderIncidentCard incident={incident} onUpdate={handleIncidentUpdate} />
+                                    <ResponderIncidentCard
+                                        incident={incident}
+                                        onUpdate={handleIncidentUpdate}
+                                        onLocate={setSelectedIncident}
+                                    />
                                 </div>
                             ))
                         )}
@@ -302,7 +306,11 @@ export default function RespondPage() {
             </div>
 
             {/* Mobile Stack */}
-            <MobileResponderStack incidents={filteredIncidents} onIncidentUpdate={handleIncidentUpdate} />
+            <MobileResponderStack
+                incidents={filteredIncidents}
+                onIncidentUpdate={handleIncidentUpdate}
+                onLocate={setSelectedIncident}
+            />
 
             {/* Mobile Filter Button */}
             <button

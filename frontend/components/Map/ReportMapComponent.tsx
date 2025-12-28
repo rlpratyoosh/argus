@@ -1,32 +1,38 @@
 "use client";
 
+import { Incident } from "@/types/incident"; // Make sure this path matches your project
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect } from "react";
-import { MapContainer, Marker, TileLayer, useMapEvents, Popup } from "react-leaflet";
-import { Incident } from "@/types/incident"; // Make sure this path matches your project
+import { useEffect, useMemo } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
 
-const UserIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+const createUserIcon = () =>
+    L.icon({
+        iconUrl: "/icons/user.png",
+        iconSize: [48, 48],
+        iconAnchor: [24, 48],
+        popupAnchor: [0, -48],
+    });
 
-const IncidentIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+const createSeverityIcon = (severity: string) => {
+    const iconMap: Record<string, string> = {
+        LOW: "/icons/low.png",
+        MEDIUM: "/icons/medium.png",
+        HIGH: "/icons/high.png",
+        CRITICAL: "/icons/critical.png",
+    };
+
+    return L.icon({
+        iconUrl: iconMap[severity] || iconMap.MEDIUM,
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40],
+    });
+};
 
 interface MapProps {
     pos?: { lat: number; lng: number };
-    incidents?: Incident[]; 
+    incidents?: Incident[];
 }
 
 function MapUpdater({ center }: { center: { lat: number; lng: number } }) {
@@ -38,8 +44,10 @@ function MapUpdater({ center }: { center: { lat: number; lng: number } }) {
 }
 
 export default function ReportMapComponent({ pos, incidents = [] }: MapProps) {
-    const defaultCenter = { lat: 20.5937, lng: 78.9629 }; 
+    const defaultCenter = { lat: 20.5937, lng: 78.9629 };
     const center = pos || defaultCenter;
+
+    const userIcon = useMemo(() => createUserIcon(), []);
 
     return (
         <div className="absolute top-0 left-0 h-screen w-screen z-0">
@@ -58,17 +66,17 @@ export default function ReportMapComponent({ pos, incidents = [] }: MapProps) {
                 {pos && (
                     <>
                         <MapUpdater center={pos} />
-                        <Marker position={[pos.lat, pos.lng]} icon={UserIcon}>
+                        <Marker position={[pos.lat, pos.lng]} icon={userIcon} zIndexOffset={1000}>
                             <Popup>You are here</Popup>
                         </Marker>
                     </>
                 )}
 
-                {incidents.map((incident) => (
-                    <Marker 
+                {incidents.map(incident => (
+                    <Marker
                         key={incident.id}
-                        position={[incident.latitude, incident.longitude]} 
-                        icon={IncidentIcon}
+                        position={[incident.latitude, incident.longitude]}
+                        icon={createSeverityIcon(incident.severity)}
                     >
                         <Popup>
                             <div className="text-black">
@@ -78,7 +86,6 @@ export default function ReportMapComponent({ pos, incidents = [] }: MapProps) {
                         </Popup>
                     </Marker>
                 ))}
-
             </MapContainer>
         </div>
     );

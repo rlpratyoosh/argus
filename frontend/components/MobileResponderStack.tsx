@@ -8,6 +8,7 @@ import ResponderIncidentCard from "./ResponderIncidentCard";
 interface MobileResponderStackProps {
     incidents: Incident[];
     onIncidentUpdate?: (updatedIncident: Incident) => void;
+    onLocate?: (incident: Incident) => void;
 }
 
 function getSeverityColor(level: string) {
@@ -154,7 +155,7 @@ function IncidentCapsule({
     );
 }
 
-export default function MobileResponderStack({ incidents, onIncidentUpdate }: MobileResponderStackProps) {
+export default function MobileResponderStack({ incidents, onIncidentUpdate, onLocate }: MobileResponderStackProps) {
     const [stackOrder, setStackOrder] = useState<number[]>([]);
     const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
 
@@ -241,7 +242,14 @@ export default function MobileResponderStack({ incidents, onIncidentUpdate }: Mo
                             <X className="w-5 h-5" />
                         </button>
 
-                        <ResponderIncidentCard incident={selectedIncident} onUpdate={handleUpdate} />
+                        <ResponderIncidentCard
+                            incident={selectedIncident}
+                            onUpdate={handleUpdate}
+                            onLocate={inc => {
+                                onLocate?.(inc);
+                                closeModal();
+                            }}
+                        />
                     </div>
                 </div>
             )}

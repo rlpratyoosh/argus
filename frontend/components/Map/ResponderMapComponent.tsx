@@ -6,45 +6,28 @@ import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
-const ResponderIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-});
+const createIncidentIcon = (severity: string, status: string) => {
+    // For resolved/closed incidents, use low severity icon (green-ish)
+    // For in-progress, keep severity-based
+    let iconPath = "/icons/medium.png";
 
-const getIncidentIcon = (severity: string, status: string) => {
-    let color = "red";
     if (status === "RESOLVED" || status === "CLOSED") {
-        color = "green";
-    } else if (status === "IN_PROGRESS") {
-        color = "gold";
+        iconPath = "/icons/low.png";
     } else {
-        switch (severity) {
-            case "CRITICAL":
-                color = "red";
-                break;
-            case "HIGH":
-                color = "orange";
-                break;
-            case "MEDIUM":
-                color = "gold";
-                break;
-            case "LOW":
-                color = "green";
-                break;
-        }
+        const iconMap: Record<string, string> = {
+            LOW: "/icons/low.png",
+            MEDIUM: "/icons/medium.png",
+            HIGH: "/icons/high.png",
+            CRITICAL: "/icons/critical.png",
+        };
+        iconPath = iconMap[severity] || iconMap.MEDIUM;
     }
 
     return L.icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41],
+        iconUrl: iconPath,
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40],
     });
 };
 
@@ -100,19 +83,11 @@ export default function ResponderMapComponent({
 
                 <MapController center={center} selectedIncident={selectedIncident} />
 
-                {responderPos && (
-                    <Marker position={[responderPos.lat, responderPos.lng]} icon={ResponderIcon}>
-                        <Popup>
-                            <div className="text-black font-semibold">Your Location</div>
-                        </Popup>
-                    </Marker>
-                )}
-
                 {incidents.map(incident => (
                     <Marker
                         key={incident.id}
                         position={[incident.latitude, incident.longitude]}
-                        icon={getIncidentIcon(incident.severity, incident.status)}
+                        icon={createIncidentIcon(incident.severity, incident.status)}
                         eventHandlers={{
                             click: () => onIncidentSelect?.(incident),
                         }}

@@ -2,18 +2,19 @@
 
 import api from "@/libs/axios";
 import type { Incident } from "@/types/incident";
-import { AlertTriangle, CheckCircle, Clock, MapPin, Shield, ThumbsUp, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, Crosshair, MapPin, Shield, ThumbsUp, XCircle } from "lucide-react";
 import { useState } from "react";
 
 interface ResponderIncidentCardProps {
     incident: Incident;
     onUpdate?: (updatedIncident: Incident) => void;
+    onLocate?: (incident: Incident) => void;
 }
 
 const statusOptions = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] as const;
 const validationOptions = ["PENDING", "VALIDATED", "REJECTED"] as const;
 
-export default function ResponderIncidentCard({ incident, onUpdate }: ResponderIncidentCardProps) {
+export default function ResponderIncidentCard({ incident, onUpdate, onLocate }: ResponderIncidentCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [currentStatus, setCurrentStatus] = useState(incident.status);
     const [currentValidation, setCurrentValidation] = useState(incident.validation);
@@ -166,9 +167,21 @@ export default function ResponderIncidentCard({ incident, onUpdate }: ResponderI
                     <span className="text-[10px] text-zinc-500">
                         {incident.city}, {incident.state}
                     </span>
-                    <span className="text-[10px] text-zinc-600 ml-auto font-mono">
+                    <span className="text-[10px] text-zinc-600 font-mono">
                         {incident.latitude.toFixed(4)}, {incident.longitude.toFixed(4)}
                     </span>
+                    {onLocate && (
+                        <button
+                            onClick={e => {
+                                e.stopPropagation();
+                                onLocate(incident);
+                            }}
+                            className="ml-auto flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-all text-[10px] font-bold"
+                        >
+                            <Crosshair className="w-3 h-3" />
+                            Locate
+                        </button>
+                    )}
                 </div>
             </div>
 
