@@ -303,16 +303,16 @@ export class AuthService {
     };
   }
 
-  async generateVerificationToken(user: safeUser) {
-    return await this.signTokens(
-      user.id,
-      this.auth.verificationExpiresIn,
-      this.auth.verificationSecret,
-      {
-        payloadType: 'VERIFICATION',
-      },
-    );
-  }
+  // async generateVerificationToken(user: safeUser) {
+  //   return await this.signTokens(
+  //     user.id,
+  //     this.auth.verificationExpiresIn,
+  //     this.auth.verificationSecret,
+  //     {
+  //       payloadType: 'VERIFICATION',
+  //     },
+  //   );
+  // }
 
   // async sendMail(message: string, email: string) {
   //   await this.mailService.sendMail({
