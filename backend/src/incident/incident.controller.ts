@@ -38,7 +38,6 @@ export class IncidentController {
   }
 
   @Get('nearby')
-  @SetPublic()
   findNearby(
     @Query('latitude') latitude: string,
     @Query('longitude') longitude: string,

@@ -1,27 +1,24 @@
 import {
-  BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
   Req,
   Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { Request, Response } from 'express';
+import { SetPublic } from 'src/common/decorators/public.decorator';
 import { AuthService, type safeUser } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { SetPublic } from 'src/common/decorators/public.decorator';
-import { AuthGuard } from '@nestjs/passport';
-import type { Response, Request } from 'express';
+import { validatedUser } from './strategies/jwt.strategy';
 interface RequestWUser extends Request {
   user: safeUser;
 }
-import { validatedUser } from './strategies/jwt.strategy';
 export interface ValidatedRequest extends Request {
   user: validatedUser;
 }
@@ -143,12 +140,22 @@ export class AuthController {
     @Req() req: ValidatedRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies['refresh-token'];
+    const refreshToken = req.cookies['refresh_token'];
 
     if (refreshToken) await this.authService.logout(refreshToken);
 
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      partitioned: true,
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      partitioned: true,
+    });
 
     return { message: 'Logged Out Succesfully' };
   }
@@ -162,8 +169,18 @@ export class AuthController {
     const userId = req.user.userId;
     if (userId) await this.authService.logoutAll(userId);
 
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      partitioned: true,
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      partitioned: true,
+    });
 
     return { message: 'Logged Out From All Devices' };
   }

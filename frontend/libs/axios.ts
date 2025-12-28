@@ -2,7 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
-    withCredentials: true, 
+    withCredentials: true,
     headers: {
         "Content-Type": "application/json",
     },
@@ -36,8 +36,20 @@ api.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        const authEndpoints = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"];
+        const authEndpoints = [
+            "/auth/login",
+            "/auth/register",
+            "/auth/refresh",
+            "/auth/logout",
+            "/auth/logoutall",
+            "/auth/me",
+        ];
         if (authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint))) {
+            return Promise.reject(error);
+        }
+
+        // Don't attempt refresh if we're already on the login page
+        if (typeof window !== "undefined" && window.location.pathname === "/login") {
             return Promise.reject(error);
         }
 

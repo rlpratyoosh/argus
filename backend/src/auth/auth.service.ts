@@ -1,13 +1,17 @@
+import { User } from '.prisma/client';
 import {
   BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+} from '@prisma/client/runtime/client';
 import { randomUUID } from 'node:crypto';
 import validateOrThrow from 'src/common/helper/zod-validation.helper';
 import authConfig from 'src/config/auth.config';
@@ -15,12 +19,6 @@ import { PrismaService } from 'src/prisma.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { HashingProvider } from './providers/hashing.provider';
 import { RegisterUserSchema } from './schema/register-user.schema';
-import { User } from '.prisma/client';
-import {
-  PrismaClientInitializationError,
-  PrismaClientKnownRequestError,
-} from '@prisma/client/runtime/client';
-import type { validatedUser } from './strategies/jwt.strategy';
 export type safeUser = Omit<User, 'password'>;
 export type accessTokenPayload = {
   sub: string;
@@ -140,7 +138,7 @@ export class AuthService {
 
     // await this.sendMail(message, user.email);
 
-    return { message: 'Registration Successful'};
+    return { message: 'Registration Successful' };
   }
 
   async refresh(userId: string, refreshToken: string, tokenId: string) {
@@ -231,17 +229,28 @@ export class AuthService {
 
   async logout(refreshToken: string) {
     const decodedToken = this.jwt.decode(refreshToken);
-    const tokenId = decodedToken.tokenId;
-    if (tokenId)
-      await this.prisma.refreshToken.delete({
+    const tokenId = decodedToken?.tokenId;
+    if (tokenId) {
+      const existingToken = await this.prisma.refreshToken.findUnique({
         where: { id: tokenId },
       });
+      if (existingToken) {
+        await this.prisma.refreshToken.delete({
+          where: { id: tokenId },
+        });
+      }
+    }
   }
 
   async logoutAll(userId: string) {
-    await this.prisma.refreshToken.deleteMany({
+    const existingTokens = await this.prisma.refreshToken.findMany({
       where: { userId },
     });
+    if (existingTokens.length > 0) {
+      await this.prisma.refreshToken.deleteMany({
+        where: { userId },
+      });
+    }
   }
 
   async signTokens<T>(
