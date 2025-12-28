@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import type { Incident } from '@prisma/client';
+import type { validatedUser } from 'src/auth/strategies/jwt.strategy';
+import validateOrThrow from 'src/common/helper/zod-validation.helper';
+import { EventsGateway } from 'src/events/events.gateway';
+import { PrismaService } from 'src/prisma.service';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 import {
-  UpdateIncidentUserDto,
   UpdateIncidentResponderDto,
+  UpdateIncidentUserDto,
 } from './dto/update-incident.dto';
-import { PrismaService } from 'src/prisma.service';
-import validateOrThrow from 'src/common/helper/zod-validation.helper';
 import createIncidentSchema from './schema/create-incident.schema';
-import type { validatedUser } from 'src/auth/strategies/jwt.strategy';
-import type { Incident } from '@prisma/client';
-import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class IncidentService {
@@ -18,7 +18,7 @@ export class IncidentService {
     private readonly eventsGateway: EventsGateway,
   ) {}
 
-  async create(createIncidentDto: CreateIncidentDto, userId: string) {
+  async create(createIncidentDto: CreateIncidentDto, userId?: string) {
     const validatedData = validateOrThrow(
       createIncidentSchema,
       createIncidentDto,
@@ -42,7 +42,7 @@ export class IncidentService {
           ...validatedData,
           city,
           state,
-          reporterId: userId,
+          reporterId: userId as string,
         },
       });
 
@@ -51,7 +51,9 @@ export class IncidentService {
       return incident;
     } catch (error) {
       console.log('Error fetching location data or creating incident:', error); // For debugging
-      throw new Error('Failed to fetch location data or create incident');
+      throw new BadRequestException(
+        'Failed to fetch location data or create incident',
+      );
     }
   }
 
