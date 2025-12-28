@@ -307,7 +307,7 @@ export default function CreateIncidentForm() {
 
                 <button
                     onClick={() => getLocation()}
-                    className="absolute bottom-32 right-6 md:bottom-10 md:right-112.5 z-20 p-3 bg-zinc-900/80 backdrop-blur text-blue-400 rounded-full border border-white/10 shadow-xl hover:bg-zinc-800 transition-all"
+                    className="absolute top-20 right-3 md:bottom-10 md:top-auto md:right-112.5 z-20 p-3 bg-zinc-900/80 backdrop-blur text-blue-400 rounded-full border border-white/10 shadow-xl hover:bg-zinc-800 transition-all"
                 >
                     <MapPin className="w-6 h-6" />
                 </button>
