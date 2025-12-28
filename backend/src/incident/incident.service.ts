@@ -338,4 +338,32 @@ export class IncidentService {
       throw new BadRequestException(`Failed to remove incident`);
     }
   }
+
+  async findByReporter(userId: string) {
+    return this.prismaService.incident.findMany({
+      where: { reporterId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findVotedByUser(userId: string) {
+    const votedIncidents = await this.prismaService.votedIncident.findMany({
+      where: { userId },
+      include: {
+        incident: {
+          include: {
+            reporter: {
+              select: { id: true, username: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return votedIncidents.map((v) => ({
+      ...v.incident,
+      userVote: { upVoted: v.upVoted, downVoted: v.downVoted },
+    }));
+  }
 }

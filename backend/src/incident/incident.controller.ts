@@ -10,7 +10,6 @@ import {
   Req,
 } from '@nestjs/common';
 import type { ValidatedRequest } from 'src/auth/auth.controller';
-import { SetPublic } from 'src/common/decorators/public.decorator';
 import { AllowedRole } from 'src/common/decorators/roles.decorator';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 import {
@@ -71,6 +70,16 @@ export class IncidentController {
   @Patch('downvote/:id')
   downvote(@Param('id') id: string, @Req() req: ValidatedRequest) {
     return this.incidentService.downvote(id, req.user.userId);
+  }
+
+  @Get('my-reports')
+  findMyReports(@Req() req: ValidatedRequest) {
+    return this.incidentService.findByReporter(req.user.userId);
+  }
+
+  @Get('my-votes')
+  findMyVotes(@Req() req: ValidatedRequest) {
+    return this.incidentService.findVotedByUser(req.user.userId);
   }
 
   @Patch('responder/:id')

@@ -36,15 +36,16 @@ api.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        const authEndpoints = [
+        // Only skip refresh for auth endpoints that are part of the auth flow itself
+        // /auth/me should NOT be skipped - it needs token refresh when access token expires
+        const skipRefreshEndpoints = [
             "/auth/login",
             "/auth/register",
             "/auth/refresh",
             "/auth/logout",
             "/auth/logoutall",
-            "/auth/me",
         ];
-        if (authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint))) {
+        if (skipRefreshEndpoints.some(endpoint => originalRequest.url?.includes(endpoint))) {
             return Promise.reject(error);
         }
 
